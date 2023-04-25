@@ -3,39 +3,35 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-#ifdef WIN32
-#define GNUPLOT_NAME "C:\\gnuplot\\bin\\gnuplot -persist"
-#else
-#define GNUPLOT_NAME "gnuplot -persist"
-#endif
+
 class Matrix{
 public:
-    float** elements;
+    double** elements;
     int n = 0;
     int m = 0;
 
     Matrix(int n){
         this->n = n;
         this->m = n;
-        elements = new float*[n];
+        elements = new double*[n];
         for (int i = 0; i < n; i++) {
-            elements[i] = new float[m];
+            elements[i] = new double[m];
         }
     }
 
     Matrix(int n, int m){
         this->n = n;
         this->m = m;
-        elements = new float*[n];
+        elements = new double*[n];
         for (int i = 0; i < n; i++) {
-            elements[i] = new float[m];
+            elements[i] = new double[m];
         }
     }
 
     void outputMatrix(){
         for(int i = 0; i < n; i ++){
             for(int j = 0; j < m; j ++){
-                if(abs(elements[i][j]) < 0.00001){
+                if(abs(elements[i][j]) < 0.00005){
                     cout<<fixed<<setprecision(4)<<0.0000<<" ";
                 }else {
                     cout << fixed << setprecision(4) << elements[i][j] << " ";
@@ -99,7 +95,7 @@ public:
 
         for(int i = 0; i < m3.n; i ++){
             for(int j = 0; j < m3.m; j ++){
-                float sum = 0;
+                double sum = 0;
                 for(int k = 0; k < m; k ++){
                     sum += elements[i][k] * m2.elements[k][j];
                 }
@@ -286,7 +282,7 @@ Matrix inverseMatrix(Matrix a){
 
 
     for(int i = 0; i < n; i ++){
-        float f = A.elements[i][i];
+        double f = A.elements[i][i];
         A.elements[i][i] = 1;
         for(int j = 0; j < n; j ++){
             b.elements[i][j]/=f;
@@ -320,8 +316,6 @@ int main() {
     }
 
 
-
-
     auto B = Matrix(n, 1);
     for(int i = 0; i < n; i ++){
         B.elements[i][0] = b[i];
@@ -341,49 +335,5 @@ int main() {
     cout<<"x~:"<<endl;
     Matrix ans = ((inverseMatrix((A.T()*A)))*(A.T()*B));
     ans.outputMatrix();
-
-
-
-
-
-    //https://github.com/AlekseyKorshuk/least-square-approximation/
-    //helped a lot with gnuplot
-    FILE* pipe = _popen(GNUPLOT_NAME, "w");
-
-    string func;
-    for (int i = 0; i <= st; i++){
-        stringstream ss;
-        ss << ans.elements[i][0] ;
-        string s;
-        ss >> s;
-        func+= s;
-        func+= "*x**";
-        stringstream ss2;
-        ss2 << i ;
-        string s2;
-        ss2 >> s2;
-        func+= s2;
-        func+=" + ";
-    }
-    func+="0";
-    cout << func << endl;
-
-    int m = func.length();
-
-    char char_array[n + 1];
-
-    strcpy(char_array, func.c_str());
-
-    fprintf(pipe, "set yrange [0:%d]\n", m + 6);
-    fprintf(pipe, "f(x) = %s\n", char_array);
-
-    fprintf(pipe, "plot [0:%d] f(x) title 'appr', '-' using 1:2 title 'exp' with points pointtype 5 pointsize 1\n", m);
-    for (int i = 0; i < m; i++){
-        fprintf(pipe, "%i %f\n", t[i], rand.elements[i][0]);
-    }
-
-    fprintf(pipe, "%s\n", "e");
-
-    _pclose(pipe);
 
 }
